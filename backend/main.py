@@ -5,3 +5,5 @@ app =  FastAPI(title="FastAPI Backend", description="A simple FastAPI backend fo
 @app.get("/")
 def root():
     return {"message": "Bienvenido a FarmaSmart API!"}
+
+print("Hola bebe")
