@@ -6,6 +6,14 @@ from passlib.context import CryptContext
 from app.core.config import settings
 from app.schemas.auth import TokenPayload
 
+# ── Configuración de JWT ───────────────────────────────────────
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy.orm import Session
+from app.core.database import get_db
+from app.models.usuario import Usuario
+from jose import JWTError
+
 
 # ── Configuración de bcrypt ────────────────────────────────────
 # CryptContext maneja el hashing de contraseñas.
@@ -89,3 +97,45 @@ def verificar_token(token: str) -> TokenPayload:
         rol=payload["rol"],
         exp=payload["exp"]
     )
+    
+
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+
+
+def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
+) -> Usuario:
+    """
+    Obtiene el usuario autenticado a partir del token JWT.
+    """
+    try:
+        payload = verificar_token(token)
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido o expirado",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    usuario = db.query(Usuario).filter(Usuario.id == payload.sub).first()
+
+    if not usuario:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
+        )
+
+    return usuario
+
+def get_current_admin(user: Usuario = Depends(get_current_user)) -> Usuario:
+    """
+    Verifica que el usuario autenticado sea ADMIN.
+    """
+    if user.rol != "ADMIN":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Solo administradores"
+        )
+    return user
