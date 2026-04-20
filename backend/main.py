@@ -13,13 +13,14 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)
+) 
 
 app.include_router(auth.router)
 app.include_router(ventas.router)
 app.include_router(productos.router)
 app.include_router(empleados.router)   # ★ registrar router
 app.include_router(perfil.router, prefix="/api")
+
 
 @app.get("/")
 def health_check():
