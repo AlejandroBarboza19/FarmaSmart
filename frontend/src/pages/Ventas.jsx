@@ -1,10 +1,12 @@
 // src/pages/Ventas.jsx  — header removido, lo provee Layout
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { obtenerProductosService, registrarVentaService } from '../services/api'
 import Ticket from '../components/Ticket'
 
 export default function Ventas() {
+  const navigate = useNavigate()
   const [productos,      setProductos]      = useState([])
   const [carrito,        setCarrito]        = useState({})
   const [metodoPago,     setMetodoPago]     = useState('EFECTIVO')
@@ -88,29 +90,36 @@ export default function Ventas() {
     <div className="flex h-[calc(100vh-4rem)] bg-[#f6faff] overflow-hidden">
 
       {/* ── Sidebar ──────────────────────────────────────────── */}
-      <aside className="bg-slate-100 w-64 border-r border-slate-200 flex flex-col p-4 shrink-0">
-        <div className="mb-8 px-2">
-          <h3 className="text-sm font-bold text-[#00527b] uppercase tracking-widest">
-            {usuario?.farmacia_nombre || 'FarmaSmart'}
-          </h3>
-          <p className="text-xs text-slate-500">Punto de Venta</p>
-        </div>
-        <nav className="flex-1 space-y-2">
-          {[
-            { icon: 'point_of_sale', label: 'Nueva Venta', active: true  },
-            { icon: 'history',       label: 'Historial',   active: false },
-            { icon: 'inventory_2',   label: 'Stock',       active: false },
-            { icon: 'analytics',     label: 'Análisis',    active: false },
-          ].map(item => (
-            <button key={item.label}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all
-                ${item.active ? 'bg-white text-sky-800 shadow-sm' : 'text-slate-500 hover:translate-x-1 hover:bg-white/50'}`}>
-              <span className="material-symbols-outlined">{item.icon}</span>
-              {item.label}
-            </button>
-          ))}
-        </nav>
-      </aside>
+      {/* ── Sidebar ──────────────────────────────────────────── */}
+<aside className="bg-slate-100 w-64 border-r border-slate-200 flex flex-col p-4 shrink-0">
+  <div className="mb-8 px-2">
+    <h3 className="text-sm font-bold text-[#00527b] uppercase tracking-widest">
+      {usuario?.farmacia_nombre || 'FarmaSmart'}
+    </h3>
+    <p className="text-xs text-slate-500">Punto de Venta</p>
+  </div>
+  <nav className="flex-1 space-y-2">
+    {[
+      { icon: 'point_of_sale', label: 'Nueva Venta', ruta: null,         active: true  },
+      { icon: 'history',       label: 'Historial',   ruta: '/dashboard', active: false },
+      { icon: 'inventory_2',   label: 'Stock',       ruta: '/inventario',active: false },
+      { icon: 'analytics',     label: 'Análisis',    ruta: '/dashboard', active: false },
+    ].map(item => (
+      <button
+        key={item.label}
+        onClick={() => item.ruta && navigate(item.ruta)}
+        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all
+          ${item.active
+            ? 'bg-white text-sky-800 shadow-sm'
+            : 'text-slate-500 hover:translate-x-1 hover:bg-white/50'
+          }`}
+      >
+        <span className="material-symbols-outlined">{item.icon}</span>
+        {item.label}
+      </button>
+    ))}
+  </nav>
+</aside>
 
       {/* ── Panel productos ───────────────────────────────────── */}
       <section className="flex-1 p-8 overflow-y-auto">

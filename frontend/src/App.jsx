@@ -10,18 +10,18 @@ import GestionEmpleados   from './pages/empleados/GestionEmpleados'
 import FormularioEmpleado from './pages/empleados/FormularioEmpleado'
 import DetalleEmpleado    from './pages/empleados/DetalleEmpleado'
 import CambiarPassword    from './pages/empleados/CambiarPassword'
-import Perfil        from './pages/Perfil'
-import Configuracion from './pages/Configuracion'
+import Perfil             from './pages/Perfil'
+import Configuracion      from './pages/Configuracion'
+import Dashboard          from './pages/Dashboard'
+import Inventario         from './pages/Inventario'
 
-// ── Ruta protegida con Layout ──────────────────────────────────
 function RutaProtegida({ children, soloAdmin = false }) {
   const { usuario } = useAuth()
   if (!usuario) return <Navigate to="/login" replace />
-  if (soloAdmin && usuario.rol !== 'ADMIN') return <Navigate to="/ventas" replace />
+  if (soloAdmin && usuario.rol !== 'ADMIN') return <Navigate to="/dashboard" replace />
   return <Layout>{children}</Layout>
 }
 
-// ── App ────────────────────────────────────────────────────────
 export default function App() {
   return (
     <AuthProvider>
@@ -33,11 +33,21 @@ export default function App() {
           <Route path="/registro" element={<Registro />} />
 
           {/* Protegidas — cualquier rol */}
+          <Route path="/dashboard" element={
+            <RutaProtegida><Dashboard /></RutaProtegida>
+          } />
+          <Route path="/inventario" element={
+            <RutaProtegida><Inventario /></RutaProtegida>
+          } />
           <Route path="/ventas" element={
             <RutaProtegida><Ventas /></RutaProtegida>
           } />
-          <Route path="/perfil"        element={<Perfil />} />
-          <Route path="/configuracion" element={<Configuracion />} />
+          <Route path="/perfil" element={
+            <RutaProtegida><Perfil /></RutaProtegida>
+          } />
+          <Route path="/configuracion" element={
+            <RutaProtegida><Configuracion /></RutaProtegida>
+          } />
 
           {/* Protegidas — solo ADMIN */}
           <Route path="/empleados" element={
@@ -56,7 +66,6 @@ export default function App() {
             <RutaProtegida soloAdmin><CambiarPassword /></RutaProtegida>
           } />
 
-          {/* Catch-all */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>

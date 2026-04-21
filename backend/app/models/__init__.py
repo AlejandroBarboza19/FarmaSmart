@@ -8,3 +8,4 @@ from app.models.venta         import Venta
 from app.models.detalle_venta import DetalleVenta
 from app.models.categoria     import Categoria
 from app.models.proveedor     import Proveedor
+from app.models.alerta import Alerta, TipoAlerta

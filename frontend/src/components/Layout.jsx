@@ -1,8 +1,8 @@
+// src/components/Layout.jsx
 import { useState, useRef, useEffect } from 'react'
-import { useNavigate, useLocation, NavLink } from 'react-router-dom'
+import { useNavigate, NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
-// Componente auxiliar para el círculo del Avatar
 function Avatar({ nombre, size = 'sm' }) {
   const iniciales = (nombre || 'U').split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()
   const sz = size === 'lg' ? 'w-10 h-10 text-sm' : 'w-8 h-8 text-xs'
@@ -16,11 +16,9 @@ function Avatar({ nombre, size = 'sm' }) {
 export default function Layout({ children }) {
   const { usuario, logout } = useAuth()
   const navigate = useNavigate()
-  const location = useLocation()
   const [menuAbierto, setMenuAbierto] = useState(false)
   const menuRef = useRef(null)
 
-  // Cerrar menú al hacer clic afuera
   useEffect(() => {
     const handler = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -31,11 +29,12 @@ export default function Layout({ children }) {
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  // Definición de navegación con control de acceso
+  // ── Navegación principal con Dashboard e Inventario agregados ──
   const NAV_LINKS = [
-    { to: '/ventas', label: 'Ventas' },
-    { to: '/empleados', label: 'Empleados', soloAdmin: true },
-    { to: '/reportes', label: 'Reportes', soloAdmin: true },
+    { to: '/dashboard',  label: 'Dashboard' },
+    { to: '/inventario', label: 'Inventario' },
+    { to: '/ventas',     label: 'Ventas' },
+    { to: '/empleados',  label: 'Empleados', soloAdmin: true },
   ]
 
   const esAdmin = usuario?.rol === 'ADMIN'
@@ -43,13 +42,13 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen bg-[#f6faff] flex flex-col">
 
-      {/* ── TopBar ────────────────────────────────────────── */}
+      {/* ── TopBar ─────────────────────────────────────────── */}
       <header className="bg-slate-50 shadow-sm w-full h-16 flex items-center justify-between px-8 sticky top-0 z-[60]">
 
         {/* Logo + Nav */}
         <div className="flex items-center gap-8">
           <span
-            onClick={() => navigate('/ventas')}
+            onClick={() => navigate('/dashboard')}
             className="text-2xl font-bold tracking-tighter text-sky-900 cursor-pointer select-none"
           >
             FarmaSmart
@@ -85,7 +84,7 @@ export default function Layout({ children }) {
 
           {/* Configuración - SOLO ADMIN */}
           {esAdmin && (
-            <button 
+            <button
               onClick={() => navigate('/configuracion')}
               className="p-2 hover:bg-sky-50 rounded-lg transition-all active:scale-95"
             >
@@ -128,7 +127,6 @@ export default function Layout({ children }) {
                 </div>
 
                 <div className="p-2">
-                  {/* Mi Perfil (Para todos) */}
                   <button
                     onClick={() => { setMenuAbierto(false); navigate('/perfil') }}
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-[#151c22] hover:bg-[#edf4fc] transition-colors text-left"
@@ -137,7 +135,6 @@ export default function Layout({ children }) {
                     Mi Perfil
                   </button>
 
-                  {/* Gestión de Empleados - SOLO ADMIN */}
                   {esAdmin && (
                     <button
                       onClick={() => { setMenuAbierto(false); navigate('/empleados') }}
@@ -148,7 +145,6 @@ export default function Layout({ children }) {
                     </button>
                   )}
 
-                  {/* Configuración Farmacia - SOLO ADMIN */}
                   {esAdmin && (
                     <button
                       onClick={() => { setMenuAbierto(false); navigate('/configuracion') }}
@@ -161,9 +157,8 @@ export default function Layout({ children }) {
 
                   <div className="border-t border-[#e2e9f1] my-2" />
 
-                  {/* Cerrar sesión */}
                   <button
-                    onClick={() => { setMenuAbierto(false); logout() }}
+                    onClick={() => { setMenuAbierto(false); logout(); navigate('/login') }}
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-600 hover:bg-red-50 transition-colors text-left"
                   >
                     <span className="material-symbols-outlined">logout</span>
@@ -176,7 +171,7 @@ export default function Layout({ children }) {
         </div>
       </header>
 
-      {/* ── Contenido ─────────────────────────────────────── */}
+      {/* ── Contenido ──────────────────────────────────────── */}
       <main className="flex-1">
         {children}
       </main>

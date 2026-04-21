@@ -31,8 +31,7 @@ export default api
 export const registrarFarmaciaService = (datos) =>
   api.post('/auth/registro', datos)
 
-export const obtenerProductosService = () =>
-  api.get('/productos')
+export const obtenerProductosService = () => api.get('/medicamentos/')
 
 // ── Perfil ─────────────────────────────────────────────────
 export const obtenerPerfilService     = ()       => api.get('/perfil/me')

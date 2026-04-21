@@ -1,7 +1,7 @@
 # backend/main.py  — agrega la línea marcada con ★
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import auth, ventas, productos, empleados   # ★ importar empleados
+from app.api import auth, ventas, productos, empleados, alertas, categorias, dashboard, lotes, medicamentos   # ★ importar empleados
 from app.models import usuario, farmacia, producto, lote, venta, detalle_venta
 from app.api import perfil
 
@@ -20,6 +20,11 @@ app.include_router(ventas.router)
 app.include_router(productos.router)
 app.include_router(empleados.router)   # ★ registrar router
 app.include_router(perfil.router, prefix="/api")
+app.include_router(alertas.router)
+app.include_router(categorias.router)
+app.include_router(dashboard.router)
+app.include_router(lotes.router)
+app.include_router(medicamentos.router)
 
 @app.get("/")
 def health_check():
